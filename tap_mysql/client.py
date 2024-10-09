@@ -419,9 +419,6 @@ class MySQLStream(SQLStream):
         # Apply column filtering based on configuration
         column_filter = self.config.get("column_filter", {}).get(self.name)
         column_value = self.config.get("column_value", {}).get(self.name)
-
-        # Print statement before the if column_filter command
-        print(f"Applying column filter: {column_filter} = {column_value}")
         
         if column_filter and column_value:
             column_filter_col = table.columns[column_filter]
