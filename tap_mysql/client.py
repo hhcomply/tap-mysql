@@ -292,6 +292,8 @@ class MySQLConnector(SQLConnector):
             row_count=None,
             stream_alias=None,
             replication_key=None,  # Must be defined by user
+            column_filter=None,
+            column_value=None,
         )
 
     def get_sqlalchemy_type(self, col_meta_type: str) -> sqlalchemy.Column:
@@ -413,6 +415,18 @@ class MySQLStream(SQLStream):
             column_names=selected_column_names,
         )
         query = table.select()
+
+        # Apply column filtering based on configuration
+        column_filter = self.config.get("column_filter", {}).get(self.name)
+        column_value = self.config.get("column_value", {}).get(self.name)
+
+        # Print statement before the if column_filter command
+        print(f"Applying column filter: {column_filter} = {column_value}")
+        
+        if column_filter and column_value:
+            column_filter_col = table.columns[column_filter]
+            query = query.filter(column_filter_col == column_value)
+        
         if self.replication_key:
             replication_key_col = table.columns[self.replication_key]
             query = query.order_by(replication_key_col)
