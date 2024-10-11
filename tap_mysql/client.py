@@ -415,14 +415,11 @@ class MySQLStream(SQLStream):
             column_names=selected_column_names,
         )
         query = table.select()
-
-        # Apply column filtering based on configuration
-        column_filter = self.config.get("column_filter", {}).get(self.name)
-        column_value = self.config.get("column_value", {}).get(self.name)
         
-        if column_filter and column_value:
-            column_filter_col = table.columns[column_filter]
-            query = query.filter(column_filter_col == column_value)
+        if self.column_filter and self.column_value:
+            column_filter_col = table.columns[self.column_filter]
+            column_value_filter = table.columns[self.column_value]
+            query = query.filter(column_filter_col=column_value_filter)
         
         if self.replication_key:
             replication_key_col = table.columns[self.replication_key]
