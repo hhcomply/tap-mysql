@@ -416,10 +416,10 @@ class MySQLStream(SQLStream):
         )
         query = table.select()
         
-        if self.column_filter and self.column_value:
-            column_filter_col = table.columns[self.column_filter]
-            column_value_filter = table.columns[self.column_value]
-            query = query.filter(column_filter_col=column_value_filter)
+        if table_name == "device" and table_name == "read_and_sign_token":
+            column_filter_col = "airline_id"
+            column_value_filter = "'208'"
+            query = query.filter_by(column_filter_col=column_value_filter)
         
         if self.replication_key:
             replication_key_col = table.columns[self.replication_key]
