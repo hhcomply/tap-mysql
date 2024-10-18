@@ -10,6 +10,7 @@ from singer_sdk import SQLConnector, SQLStream
 from singer_sdk import typing as th
 from singer_sdk._singerlib import CatalogEntry, MetadataMapping, Schema
 from singer_sdk.helpers._typing import TypeConformanceLevel
+from sqlalchemy import column
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine
@@ -413,6 +414,18 @@ class MySQLStream(SQLStream):
             column_names=selected_column_names,
         )
         query = table.select()
+
+        #Retrieve column_filter and column_value from config settings if provided
+        column_filter = self.config.get("column_filter")
+        column_value = self.config.get("column_value")
+
+        #Filter query by column_filter and column_value if provided
+        if column_filter and column_value:
+            query = query.filter(column(column_filter) == column_value)
+            self.logger.info(f"Filtering query by {column_filter} with value {column_value}")
+        else:
+            self.logger.info("No column_filter or column_value provided")
+
         if self.replication_key:
             replication_key_col = table.columns[self.replication_key]
             query = query.order_by(replication_key_col)
